@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from typing import List
 from pathlib import Path
 from typing import Dict
-from vpnabc import AbcSite
+from vpnabc import AbcSite, VPNFileNotFoundError
 from vpngate import VPNGate
 
 CONF_DIR = 'ovpn.conf.d'
@@ -21,7 +21,13 @@ class VPNManager:
         self.__argv = argv
     
     def start(self) -> None:
-        self.__parser.parse_args(self.__argv[1:])
+        ns = self.__parser.parse_args(self.__argv[1:])
+
+        if ns.list:
+            self.__print_tables()
+        if ns.update:
+            self.__update_tables()
+        
 
     def __init_conf_dir(self) -> None:
         if not os.path.isdir(WORK_FOLDER):
@@ -44,6 +50,19 @@ class VPNManager:
             nargs=1, type=int, help='Vpn server number')
         
         return parser
+
+    def __print_tables(self) -> None:
+        for key, value in self.__vpn_parsers.items():
+            print(f'Table: {key}')
+            try:
+                print(value.table(), end='\n\n')
+            except VPNFileNotFoundError as ex:
+                print(f' Config file not found: "{ex._file_path}"\n Use the flag: "--update"\n', file=sys.stderr)
+    
+    def __update_tables(self) -> None:
+        for key, value in self.__vpn_parsers.items():
+            print(f'Table "{key}" updated...')
+            value.update()
         
 
 def main():
