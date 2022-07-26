@@ -21,4 +21,8 @@ class AbcSite(ABC):
     def update(self) -> None:
         pass
 
+    @abstractmethod
+    def get_config(self, index: int) -> str:
+        pass
+
     
