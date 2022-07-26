@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class AbcSite(ABC):
     def __init__(self, workfolder: str) -> None:
-        self.__workfolder = workfolder
+        self._workfolder = workfolder
 
     @abstractmethod
     def table(self) -> str:
