@@ -1,4 +1,6 @@
-from vpnabc import AbcSite
+from vpnabc import (
+    AbcSite, VPNError, VPNFileNotFoundError
+)
 import requests
 import os
 import csv
@@ -18,7 +20,7 @@ class VPNGate(AbcSite):
 
     def table(self) -> str:
         if not os.path.isfile(self.__csv_path):
-            return
+            raise VPNFileNotFoundError(self.__csv_path)
 
         header = ['№', self.__table_country, self.__table_ip, self.__table_speed, self.__table_ping]
         table = PrettyTable(header)
