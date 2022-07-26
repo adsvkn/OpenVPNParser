@@ -1,14 +1,16 @@
-from ast import Index
-from vpnabc import (
-    AbcSite, VPNError, VPNFileNotFoundError
-)
-import requests
+#pylint: disable=invalid-name
+""" VPNGate """
 import os
 import csv
+import requests
 from base64 import b64decode
 from prettytable import PrettyTable
+from vpnabc import (
+    AbcSite, VPNFileNotFoundError
+)
 
 class VPNGate(AbcSite):
+    """ Класс - парсер VPN серверов с сайта www.vpngate.net """
     __url = 'http://www.vpngate.net/api/iphone/'
     __csv_name = 'vpngate.csv'
     __table_ip = 'IP'
@@ -50,7 +52,7 @@ class VPNGate(AbcSite):
             if not data.ok:
                 pass
             return data.content.decode('utf8')
-    
+
     def update(self) -> None:
         data = self._download()
         csv_data = '\n'.join(str(data).split('\n')[1:-2])
@@ -60,14 +62,14 @@ class VPNGate(AbcSite):
     def _decode_config(self, index: int) -> str:
         if not os.path.isfile(self.__csv_path):
             raise VPNFileNotFoundError(self.__csv_path)
-        
+
         vpn_cfg_path = os.path.join(self._workfolder, f'vpngate-{str(index)}.ovpn')
         with open(self.__csv_path, 'r') as file:
             lines = file.readlines()
-            
-            if not (0 < index < len(lines)):
+
+            if not 0 < index < len(lines):
                 raise IndexError()
-            
+
             base64_data = lines[index].split(self.__csv_delimeter)[-1]
             decode_data = b64decode(base64_data).decode('utf8')
 
@@ -78,7 +80,7 @@ class VPNGate(AbcSite):
 
     def get_config(self, index: int) -> str:
         return self._decode_config(index)
-    
+
 if __name__ == '__main__':
     vg = VPNGate('.')
     #vg.update()
