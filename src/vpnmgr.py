@@ -9,6 +9,7 @@ from vpngate import VPNGate
 
 CONF_DIR = 'ovpn.conf.d'
 WORK_FOLDER = str(Path(sys.argv[0]).parent / CONF_DIR)
+OVPN_BIN = '/usr/sbin/openvpn'
 
 class VPNManager:
     __vpn_parsers: Dict[str, AbcSite] = {
@@ -27,6 +28,8 @@ class VPNManager:
             self.__print_tables()
         if ns.update:
             self.__update_tables()
+        if ns.table and ns.index:
+            self.__connect(ns.table, ns.index)
         
 
     def __init_conf_dir(self) -> None:
@@ -45,9 +48,9 @@ class VPNManager:
         subparser = parser.add_subparsers()
         subparser_connect = subparser.add_parser('connect', help='Connect to VPN server')
         subparser_connect.add_argument('--table', '-t', dest='table',
-            nargs=1,type=str, choices=choices_vpn, help='Select VPN table')
+            type=str, choices=choices_vpn, help='Select VPN table')
         subparser_connect.add_argument('--index', '-i', dest='index',
-            nargs=1, type=int, help='Vpn server number')
+            type=int, help='Vpn server number')
         
         return parser
 
@@ -57,13 +60,22 @@ class VPNManager:
             try:
                 print(value.table(), end='\n\n')
             except VPNFileNotFoundError as ex:
-                print(f' Config file not found: "{ex._file_path}"\n Use the flag: "--update"\n', file=sys.stderr)
+                print(f' Config file not found: "{ex._file_path}"\n Use the flag: "--update"', file=sys.stderr)
     
     def __update_tables(self) -> None:
         for key, value in self.__vpn_parsers.items():
             print(f'Table "{key}" updated...')
             value.update()
-        
+
+    def __connect(self, table: str, index: int) -> None:
+        try:
+            ovpn_cfg = self.__vpn_parsers[table].get_config(index)
+        except VPNFileNotFoundError as ex:
+            print(f' Config file not found: "{ex._file_path}"\n Use the flag: "--update"', file=sys.stderr)
+        except IndexError as ex:
+            print(f' Row "{index}" not found', file=sys.stderr)
+        else:
+            os.system(f'{OVPN_BIN} "{ovpn_cfg}"')
 
 def main():
     vm = VPNManager(sys.argv)
