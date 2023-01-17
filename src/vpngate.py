@@ -24,12 +24,22 @@ class VPNGate(AbcSite):
         self.__csv_path = os.path.join(self._workfolder, self.__csv_name)
 
     def table(self) -> str:
+        """ Получение таблицы vpn серверов
+
+        Raises:
+            VPNFileNotFoundError: Отсутствует файл со списком vpn серверов
+
+        Returns:
+            str: таблица vpn-серверов
+        """
+        # Существует ли файл со всеми конфигурациями
+        # vpn серверов
         if not os.path.isfile(self.__csv_path):
             raise VPNFileNotFoundError(self.__csv_path)
-
+        # заголовки к результирующей таблице
         header = ['№', self.__table_country, self.__table_ip, self.__table_speed, self.__table_ping]
         table = PrettyTable(header)
-
+        # заполнение таблицы данными vpn серверов
         with open(self.__csv_path, 'r') as file:
             for i, items in enumerate(csv.reader(file, delimiter=self.__csv_delimeter)):
                 if i == 0:
@@ -42,16 +52,35 @@ class VPNGate(AbcSite):
         return str(table)
 
     def _download(self) -> str:
+        """ Скачивание файла с конфинурациями vpn серверов
+            с сайта vpngate
+
+        Returns:
+            str: содержимое файла с конфигурациями
+        """
         data = requests.get(self.__url)
         return data.content.decode('utf8')
 
     def update(self) -> None:
+        """ Обновление данных о vpn серверах """
         data = self._download()
         csv_data = '\n'.join(str(data).split('\n')[1:-2])
         with open(self.__csv_path, 'w', encoding='utf8') as file:
             file.write(csv_data)
 
     def _decode_config(self, index: int) -> str:
+        """ Декодирование конфигурации заданного vpn сервера
+
+        Args:
+            index (int): индекс vpn сервера из таблицы
+
+        Raises:
+            VPNFileNotFoundError: не найден файл с конфигурациями vpn серверов
+            IndexError: неверный индекс vpn сервера
+
+        Returns:
+            str: полный путь до ovpn-файла с конигурацией vpn сервера
+        """
         if not os.path.isfile(self.__csv_path):
             raise VPNFileNotFoundError(self.__csv_path)
 
@@ -71,6 +100,14 @@ class VPNGate(AbcSite):
         return vpn_cfg_path
 
     def get_config(self, index: int) -> str:
+        """ Получение полного пути до ovpn-файла
+
+        Args:
+            index (int): индекс vpn сервера из таблицы
+
+        Returns:
+            str: полный путь до ovpn-файла с конигурацией vpn сервера
+        """
         return self._decode_config(index)
 
 if __name__ == '__main__':
