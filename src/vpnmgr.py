@@ -23,14 +23,14 @@ class VPNManager:
     
     def start(self) -> None:
         ns = self.__parser.parse_args(self.__argv[1:])
-
-        if ns.list:
-            self.__print_tables()
-        if ns.update:
-            self.__update_tables()
-        if ns.table and ns.index:
-            self.__connect(ns.table, ns.index)
         
+        if ns.__dict__.get('list', False):
+            self.__print_tables()
+        if ns.__dict__.get('update', False):
+            self.__update_tables()
+        if ns.__dict__.get('table', False) and \
+            ns.__dict__.get('index', False):
+            self.__connect(ns.table, ns.index)
 
     def __init_conf_dir(self) -> None:
         if not os.path.isdir(WORK_FOLDER):
@@ -48,9 +48,9 @@ class VPNManager:
         subparser = parser.add_subparsers()
         subparser_connect = subparser.add_parser('connect', help='Connect to VPN server')
         subparser_connect.add_argument('--table', '-t', dest='table',
-            type=str, choices=choices_vpn, help='Select VPN table')
+            type=str, choices=choices_vpn, default=None, help='Select VPN table')
         subparser_connect.add_argument('--index', '-i', dest='index',
-            type=int, help='Vpn server number')
+            type=int, default=None, help='Vpn server number')
         
         return parser
 
@@ -65,7 +65,10 @@ class VPNManager:
     def __update_tables(self) -> None:
         for key, value in self.__vpn_parsers.items():
             print(f'Table "{key}" updated...')
-            value.update()
+            try:
+                value.update()
+            except Exception as ex:
+                print(ex.args, file=sys.stderr)
 
     def __connect(self, table: str, index: int) -> None:
         try:

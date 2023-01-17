@@ -42,16 +42,8 @@ class VPNGate(AbcSite):
         return str(table)
 
     def _download(self) -> str:
-        try:
-            data = requests.get(self.__url)
-        except ConnectionError as ex:
-            pass
-        except Exception as ex:
-            pass
-        else:
-            if not data.ok:
-                pass
-            return data.content.decode('utf8')
+        data = requests.get(self.__url)
+        return data.content.decode('utf8')
 
     def update(self) -> None:
         data = self._download()
