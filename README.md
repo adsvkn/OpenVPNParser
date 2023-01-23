@@ -6,6 +6,7 @@
 
 * [vpngate](https://www.vpngate.net/)
 * [freevpn](https://freevpn.me/accounts/)
+* [ipspeed](https://ipspeed.info/freevpn_openvpn.php)
 
 ## Содержание
 
