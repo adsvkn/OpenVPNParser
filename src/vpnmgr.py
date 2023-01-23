@@ -18,7 +18,7 @@ class VPNManager:
 
     # Список доступных сайтовс vpn серверами
     __vpn_parsers: Dict[str, AbcSite] = {
-        #'vpngate': VPNGate(WORK_FOLDER),
+        'vpngate': VPNGate(WORK_FOLDER),
         'freevpn': FreeVPN(WORK_FOLDER),
         'ipspeed': IPSpeedVPN(WORK_FOLDER)
     }
