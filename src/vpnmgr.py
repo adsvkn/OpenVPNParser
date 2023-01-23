@@ -7,6 +7,7 @@ from typing import Dict
 from vpnabc import AbcSite, VPNFileNotFoundError
 from vpngate import VPNGate
 from freevpn import FreeVPN
+from ipspeed import IPSpeedVPN
 
 CONF_DIR = 'ovpn.conf.d'
 WORK_FOLDER = str(Path(sys.argv[0]).parent / CONF_DIR)
@@ -17,8 +18,9 @@ class VPNManager:
 
     # Список доступных сайтовс vpn серверами
     __vpn_parsers: Dict[str, AbcSite] = {
-        'vpngate': VPNGate(WORK_FOLDER),
-        'freevpn': FreeVPN(WORK_FOLDER)
+        #'vpngate': VPNGate(WORK_FOLDER),
+        'freevpn': FreeVPN(WORK_FOLDER),
+        'ipspeed': IPSpeedVPN(WORK_FOLDER)
     }
 
     def __init__(self, argv: List[str]) -> None:
