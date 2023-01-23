@@ -4,4 +4,4 @@
 __pycache__
 vpngate.csv
 vpngate-*.ovpn
-ovpn.conf.d/*
+ovpn.conf.d

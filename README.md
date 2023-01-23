@@ -5,6 +5,7 @@
 На текущий момент доступны OpenVPN сервера со следующих сайтов:
 
 * [vpngate](https://www.vpngate.net/)
+* [freevpn](https://freevpn.me/accounts/)
 
 ## Содержание
 
